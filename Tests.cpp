@@ -4,6 +4,67 @@
 #include <cassert>
 #include <iostream>
 #include <chrono>
+#include <string>
+
+
+void TestStringQueue()
+{
+    Queue<std::string> q;
+
+    // Test Enqueue & Front & Dequeue
+    q.Enqueue("hello");
+    q.Enqueue("world");
+    assert(q.GetLength() == 2);
+    assert(q.Front() == "hello");
+    assert(q.Dequeue() == "hello");
+    assert(q.Front() == "world");
+
+    // Test Map (Uppercase transformation)
+    Queue<std::string> mapped = q.Map([](std::string s) {
+        for (auto &c : s) c = toupper(c);
+        return s;
+    });
+    assert(mapped.Front() == "WORLD");
+
+    // Test Where (Filter length)
+    Queue<std::string> words;
+    words.Enqueue("cat");
+    words.Enqueue("elephant");
+    words.Enqueue("dog");
+
+    Queue<std::string> longWords = words.Where([](std::string s) {
+        return s.length() > 3;
+    });
+    assert(longWords.GetLength() == 1);
+    assert(longWords.Front() == "elephant");
+
+    // Test Reduce (Concatenation)
+    std::string sentence = words.Reduce(
+        [](std::string elem, std::string acc) {
+            return acc.empty() ? elem : acc + " " + elem;
+        },
+        std::string("")
+    );
+    assert(sentence == "cat elephant dog");
+
+    // Test Subqueue Search
+    Queue<std::string> phrase;
+    phrase.Enqueue("apple");
+    phrase.Enqueue("banana");
+    phrase.Enqueue("cherry");
+
+    Queue<std::string> sub;
+    sub.Enqueue("banana");
+    sub.Enqueue("cherry");
+
+    assert(phrase.FindSubQueue(sub) == 1);
+
+    std::cout << "All String Queue tests passed successfully!\n";
+}
+
+
+
+
 
 void TestEnqueue()
 {
@@ -159,6 +220,7 @@ void TestAssignment()
 
 void RunAllTests()
 {
+    TestStringQueue();
     TestEnqueue();
     TestDequeue();
     TestConcat();
@@ -169,7 +231,7 @@ void RunAllTests()
     TestFindSubQueue();
     TestCopyConstructor();
     TestAssignment();
-    std::cout << "All tests passed!" << std::endl;
+    std::cout << "All int tests passed!" << std::endl;
 }
 
 void PerformanceTest()
